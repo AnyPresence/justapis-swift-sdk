@@ -76,6 +76,8 @@ class PushNotificationMethodTests: XCTestCase {
         let baseUrl = "http://localhost"
         
         let endpointCodename = "--endpoint_codename--"
+        let platform = "test_platform"
+        let channel = "test_channel"
         let name = "test_name"
         
         let expectedURL = NSURL(string:"http://localhost/push/\(endpointCodename)/unsubscribe")!
@@ -93,6 +95,8 @@ class PushNotificationMethodTests: XCTestCase {
             
             let body:AnyObject? = bodyData != nil ? try? NSJSONSerialization.JSONObjectWithData(bodyData!, options: NSJSONReadingOptions(rawValue:0)) : nil
             
+            XCTAssertEqual(body?["platform"], platform)
+            XCTAssertEqual(body?["channel"], channel)
             XCTAssertEqual(body?["name"], name)
             
             XCTAssertEqual(request.URL, expectedURL)
@@ -101,7 +105,7 @@ class PushNotificationMethodTests: XCTestCase {
         })
         
         let gateway:PushNotificationSupportingGateway = CompositedGateway(baseUrl: NSURL(string: baseUrl)!)
-        gateway.pushNotifications.unsubscribe(endpointCodename, name: name, callback: nil)
+        gateway.pushNotifications.unsubscribe(endpointCodename, platform: platform, channel: channel, name: name, callback: nil)
         
         self.waitForExpectationsWithTimeout(5, handler: nil)
     }
@@ -114,6 +118,8 @@ class PushNotificationMethodTests: XCTestCase {
         let baseUrl = "http://localhost"
         
         let endpointCodename = "--endpoint_codename--"
+        let platform = "test_platform"
+        let channel = "test_channel"
         let token = "B9CE9E973D135E429338D733A4142E1E8DCCA829475565025214823AB12CCD3C"
         
         let expectedURL = NSURL(string:"http://localhost/push/\(endpointCodename)/unsubscribe")!
@@ -131,6 +137,8 @@ class PushNotificationMethodTests: XCTestCase {
             
             let body:AnyObject? = bodyData != nil ? try? NSJSONSerialization.JSONObjectWithData(bodyData!, options: NSJSONReadingOptions(rawValue:0)) : nil
             
+            XCTAssertEqual(body?["platform"], platform)
+            XCTAssertEqual(body?["channel"], channel)
             XCTAssertEqual(body?["token"], token)
             
             XCTAssertEqual(request.URL, expectedURL)
@@ -139,7 +147,7 @@ class PushNotificationMethodTests: XCTestCase {
         })
         
         let gateway:PushNotificationSupportingGateway = CompositedGateway(baseUrl: NSURL(string: baseUrl)!)
-        gateway.pushNotifications.unsubscribe(endpointCodename, token: token, callback: nil)
+        gateway.pushNotifications.unsubscribe(endpointCodename, platform: platform, channel: channel, token: token, callback: nil)
         
         self.waitForExpectationsWithTimeout(5, handler: nil)
     }
