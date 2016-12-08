@@ -5,18 +5,21 @@
 Lightweight Swift SDK to connect to a JustAPIs gateway through an iOS client.
 
 ##Dependencies
+Managed using Cocoapods.
+
+Unit Tests: OHHTTPStub
 
 ### Development/Production
 There are no external dependencies when using this framework in your own project. 
 
-However, this SDK is a Swift dynamic framework, and is written in Swift 2.1 and needs a minimum deployment target of iOS 8.0. 
+However, this SDK is a Swift dynamic framework, and is written in Swift 3 and needs Xcode 8.
 
 Some features used in the SDK (i.e. tuples, structs) are not currently available in Objective-C code. If you want to use this framework in an Objective-C app, you'll need to marshall these features through Swift code of your own. 
 
 ### Unit Testing
-If you want to perform unit tests on this framework, it requires [OHHTTPStubs](https://github.com/AliSoftware/OHHTTPStubs/) in order to mock requests. It's already included as a submodule in this repository, so you can run:
+If you want to perform unit tests on this framework, it requires [OHHTTPStubs](https://github.com/AliSoftware/OHHTTPStubs/) in order to mock requests. It's already included as a pod of Unit Test Target, so you can run:
 
-```git submodule update --init``` 
+```pod install``` 
 
 to make it available.
 
@@ -35,20 +38,20 @@ The composited gateway is built from a few configurable and replacable component
 
 * A `NetworkAdapter` that accepts a `Request` and sends it out over the network before returning a `Response` or an error. The default NetworkAdapter is `FoundationNetworkAdapter`, which uses NSURLSession. 
 
-  If you prefer to use a different communications technique (AFNetworking, Alamofire, background sessions, caching, etc) you can write a simple NetworkAdapter and plug it into CompositedGateway's constructor.
+If you prefer to use a different communications technique (AFNetworking, Alamofire, background sessions, caching, etc) you can write a simple NetworkAdapter and plug it into CompositedGateway's constructor.
 
 * An optional `RequestPreparer`. A RequestPreparer can modify requests at the gateway level. You might use one to insert a token on certain requests, apply default headers, remap URL's, or serialize body data into a standard format like JSON or form-data.
 
-  Two sample `RequestPreparer`s are included in the SDK. `DefaultFieldsRequestPreparer` can apply missing query parameters or header fields to all requests. `RequestPreparerClosureAdapter` allows you to provide a simple closure that does whatever you'd like.
+Two sample `RequestPreparer`s are included in the SDK. `DefaultFieldsRequestPreparer` can apply missing query parameters or header fields to all requests. `RequestPreparerClosureAdapter` allows you to provide a simple closure that does whatever you'd like.
 
 * An optional `ResponseProcessor`. A `ResponseProcessor` can modify a response at the gateway level, before the original response callback is invoked. This provides an opportunity to do logging, handle errors, or parse common response formats like JSON or XML.
 
-  Two sample `ResponseProcessor`s are included in the SDK. `JsonResponseProcessor` deserializes the body of all responses using NSJSONSerialization. `ResponsePreparerClosureAdapter` allows you to provide a simple closure that does whatever you'd like.
+Two sample `ResponseProcessor`s are included in the SDK. `JsonResponseProcessor` deserializes the body of all responses using NSJSONSerialization. `ResponsePreparerClosureAdapter` allows you to provide a simple closure that does whatever you'd like.
 
 * An `CacheProvider` that can cache responses and return them on later requests without making another network request. The default CacheProvider is an `InMemoryCacheProvider` that stores responses in-memory using Foundation's NSCache.
 
-  If you'd like more persistent or sophisticated caching, you can implement your own CacheProvider and pass it to the CompositeGateway on initialization. 
-  
+If you'd like more persistent or sophisticated caching, you can implement your own CacheProvider and pass it to the CompositeGateway on initialization. 
+
 * An optional `SSLCertificate` to be used for certificate pinning. If you provide the public key or certificate associated with your server, its identity will be validated before any requests are sent.
 
 * An optional `DefaultRequestPropertySet` that allows you to customize the default options for GET, POST, PUT, and DELETE requests submitted to the Gateway. These defaults are used when using the Gateway's convenience methods to submit a request. If you don't provide your own defaults, the Gateway will use `GatewayDefaultRequestProperties` as found in `Request.swift` 
@@ -106,19 +109,19 @@ var gateway = CompositedGateway(baseUrl: NSURL(string:"http://my-justapi-server.
 
 gateway.get("/foo", params:["id":123], callback:
 { (result:RequestResult) in
-  
-  if let error = result.error
-  {
-     print("Received an error: \(error)")
-     return
-  }
-  guard let response = result.response else
-  {
-     print("Received no response!")
-     return
-  }
-  
-  print("Received a response with HTTP status code: \(response.statusCode)")
+
+if let error = result.error
+{
+print("Received an error: \(error)")
+return
+}
+guard let response = result.response else
+{
+print("Received no response!")
+return
+}
+
+print("Received a response with HTTP status code: \(response.statusCode)")
 })
 ```
 
@@ -135,7 +138,7 @@ Each instance of Gateway throttles requests so that no more than `maxActiveReque
 You may pause and resume the request queue at any time. When paused, the Gateway will not start any new requests that have been queued. You may want to pause the queue when you go offline and resume it when connectivity is restored.
 
 Requests are immutable and **cannot** be modified once they've been submitted to the Gateway. However, you can cancel requests that are still pending by calling `cancelRequest(...)`
- 
+
 ### Certificate Pinning
 
 The CompositedGateway supports certificate pinning. This allows you to require that the remote server publishes an expected public key, confirming its identity.
@@ -178,23 +181,23 @@ var gateway = JsonGateway(baseUrl: NSURL(string:"http://my-justapi-server.local:
 
 gateway.get("/foo", params:["id":123], callback:
 { (result:RequestResult) in
-  
-  if let error = result.error
-  {
-     print("Received an error: \(error)")
-     return
-  }
-  guard let response = result.response else
-  {
-     print("Received no response!")
-     return
-  }
-  guard let jsonData = response.parsedBody else
-  {
-  	  print:("No parsed body data found!")
-  	  return
-  }
-  print("Received a response with JSON content: \(jsonBody)")
+
+if let error = result.error
+{
+print("Received an error: \(error)")
+return
+}
+guard let response = result.response else
+{
+print("Received no response!")
+return
+}
+guard let jsonData = response.parsedBody else
+{
+print:("No parsed body data found!")
+return
+}
+print("Received a response with JSON content: \(jsonBody)")
 })
 
 ```
@@ -222,3 +225,8 @@ The SDK is designed to be lightweight and modular so that you can enhance and mo
 However, if you would like to make changes to the SDK, you are welcome to  clone or fork this repository. You will also need to modify your apps to make sure they integrate your code rather than what's hosted in this repository.
 
 Unit Testing does require that you OHHTTPStubs is available in order to mock requests, but this is bundled in as a git submodule. See **Dependencies** for more information.
+
+##Changes from Version `0.2.0` from `0.1.0`
+
+- Added Support for Swift 3
+- Refactored builder methods names from `propertName(value: PropertyType)` to `copyWith(propertyName value: PropertyType)`

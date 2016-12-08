@@ -5,6 +5,6 @@
       location = "container:JustApisSwiftSDK.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Tests/Submodules/OHHTTPStubs/OHHTTPStubs/OHHTTPStubs.xcodeproj">
+      location = "group:Pods/Pods.xcodeproj">
    </FileRef>
 </Workspace>

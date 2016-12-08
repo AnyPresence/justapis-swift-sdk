@@ -11,10 +11,10 @@ import Foundation
 ///
 /// A Response Processor implementation that does nothing
 ///
-public class NullResponseProcessor : ResponseProcessor
+open class NullResponseProcessor : ResponseProcessor
 {
-    public func processResponse(response: Response, callback: ResponseProcessorCallback) {
-        callback(response: response, error: nil)
+    open func processResponse(_ response: Response, callback: @escaping ResponseProcessorCallback) {
+        callback(response, nil)
     }
 }
 
@@ -22,18 +22,18 @@ public class NullResponseProcessor : ResponseProcessor
 /// A ResponseProcessor that dispatches its functionality to
 /// a closure provided at initialization
 ///
-public class ResponseProcessorClosureAdapter : ResponseProcessor
+open class ResponseProcessorClosureAdapter : ResponseProcessor
 {
     public typealias ResponseProcessorClosure = (Response) -> (RequestResult)
     
     private let closure:ResponseProcessorClosure
     
-    public func processResponse(response: Response, callback:ResponseProcessorCallback) {
+    open func processResponse(_ response: Response, callback: @escaping ResponseProcessorCallback) {
         let result = self.closure(response)
-        callback(response: result.response!, error: result.error)
+        callback(result.response!, result.error)
     }
     
-    public init(closure:ResponseProcessorClosure)
+    public init(closure: @escaping ResponseProcessorClosure)
     {
         self.closure = closure
     }
@@ -42,43 +42,43 @@ public class ResponseProcessorClosureAdapter : ResponseProcessor
 ///
 /// A ResponseProcessor that executes multiple other processors in series
 ///
-public class CompoundResponseProcessor : ResponseProcessor
+open class CompoundResponseProcessor : ResponseProcessor
 {
-    public var responseProcessors = [ResponseProcessor]()
+    open var responseProcessors = [ResponseProcessor]()
     
-    public func processResponse(response: Response, callback:ResponseProcessorCallback) {
+    open func processResponse(_ response: Response, callback: @escaping ResponseProcessorCallback) {
 
-        let dispatchGroup = dispatch_group_create()
+        let dispatchGroup = DispatchGroup()
 
         var response = response
-        var error:ErrorType? = nil
+        var error:Error? = nil
 
         for responseProcessor in responseProcessors
         {
-            dispatch_group_notify(dispatchGroup, dispatch_get_main_queue(), {
+            dispatchGroup.notify(queue: DispatchQueue.main, execute: {
                 guard error == nil else
                 {
                     // If there's an error, do no more processing
                     return
                 }
 
-                dispatch_group_enter(dispatchGroup)
+                dispatchGroup.enter()
                 
                 responseProcessor.processResponse(response,
                     callback:
                     {
-                        (immediateResponse:Response, immediateError:ErrorType?) in
+                        (immediateResponse:Response, immediateError:Error?) in
                         
                         response = immediateResponse
                         error = immediateError
-                        dispatch_group_leave(dispatchGroup)
+                        dispatchGroup.leave()
                     }
                 )
             })
         }
         
-        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue(), {
-            callback(response:response, error: error)
+        dispatchGroup.notify(queue: DispatchQueue.main, execute: {
+            callback(response, error)
         })
     }
     
@@ -91,12 +91,12 @@ public class CompoundResponseProcessor : ResponseProcessor
 ///
 /// Dispatches a ResponseProcessor for a matched Content-Type header (or overriden Content-Type)
 ///
-public class ContentTypeParser : ResponseProcessor
+open class ContentTypeParser : ResponseProcessor
 {
     /// Map of "Content-Type" value to ResponseProcessor
-    public var contentTypes = [String:ResponseProcessor]()
+    open var contentTypes = [String:ResponseProcessor]()
     
-    public func processResponse(response: Response, callback: ResponseProcessorCallback) {
+    open func processResponse(_ response: Response, callback: @escaping ResponseProcessorCallback) {
 
         if let contentType = response.request.contentTypeOverride ?? response.headers["Content-Type"]
         {
@@ -108,37 +108,37 @@ public class ContentTypeParser : ResponseProcessor
         }
         
         // There was either no contentType or no ResponseProcess. Just pass along our input:
-        callback(response: response, error: nil)
+        callback(response, nil)
     }
 }
 
 ///
 /// Implementation of a ResponseProcessor that decodes body data as a JSON object
 ///
-public class JsonResponseProcessor : ResponseProcessor
+open class JsonResponseProcessor : ResponseProcessor
 {
-    public func processResponse(response: Response, callback:ResponseProcessorCallback)
+    open func processResponse(_ response: Response, callback: @escaping ResponseProcessorCallback)
     {
         // Make sure the body is an NSData object, as expected
         guard let body = response.body else
         {
             // TODO create an error to indicate no body data and return
-            let error:ErrorType? = nil
-            callback(response: response, error: error)
+            let error:Error? = nil
+            callback(response, error)
             return
         }
 
         var response:Response = response
-        var error:ErrorType? = nil
+        var error:Error? = nil
 
         // Unpack the body data as a JSON object
         do
         {
-            let jsonData = try NSJSONSerialization.JSONObjectWithData(body, options: [])
+            let jsonData = try JSONSerialization.jsonObject(with: body as Data, options: [])
 
             // TODO: Parsing should use different properties! Not overwrite body!
             // Build a new Response with the parsed data replacing the original NSData
-            response = response.parsedBody(jsonData)
+            response = response.copyWith(parsedBody: jsonData)
         }
         catch let jsonError
         {
@@ -146,6 +146,6 @@ public class JsonResponseProcessor : ResponseProcessor
         }
         
         // TODO if successful, replace the response with an ImmutableJsonResponse
-        callback(response: response, error: error)
+        callback(response, error)
     }
 }

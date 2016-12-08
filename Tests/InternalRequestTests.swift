@@ -37,19 +37,19 @@ class InternalRequestTests: XCTestCase {
 
     func testHashableProtocolSupport()
     {
-        let gateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://localhost")!)
+        let gateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://localhost")!)
 
         let request = gateway.internalizeRequest(self.mockRequestDefaults)
-            .path("/abc")
-            .params(["a":1,"b":2])
+            .copyWith(path: "/abc")
+            .copyWith(params: ["a":1,"b":2])
         
-        let requestWithDifferentMethod = request.method("POST")
-        let requestWithBarelyDifferentPath = request.path("/abc/")
-        let requestWithVeryDifferentPath = request.path("/foo/bar/test")
-        let requestWithBarelyDifferentParams = request.params(["a":1,"b":3])
-        let requestWithOtherReorderedParams = request.params(["b":2,"a":1])
-        let requestWithVeryDifferentParams = request.params(["sessionID":"adakjlasdlkjsadljkaffa="])
-        let requestWithDifferentBody = request.body("test".dataUsingEncoding(NSUTF8StringEncoding))
+        let requestWithDifferentMethod = request.copyWith(method: "POST")
+        let requestWithBarelyDifferentPath = request.copyWith(path: "/abc/")
+        let requestWithVeryDifferentPath = request.copyWith(path: "/foo/bar/test")
+        let requestWithBarelyDifferentParams = request.copyWith(params: ["a":1,"b":3])
+        let requestWithOtherReorderedParams = request.copyWith(params: ["b":2,"a":1])
+        let requestWithVeryDifferentParams = request.copyWith(params: ["sessionID":"adakjlasdlkjsadljkaffa="])
+        let requestWithDifferentBody = request.copyWith(body: "test".data(using: String.Encoding.utf8))
         
         // These requests should be equal!
         XCTAssertEqual(request, request)
@@ -66,39 +66,39 @@ class InternalRequestTests: XCTestCase {
     
     func testBuilderMethods()
     {
-        let gateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://localhost")!)
+        let gateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://localhost")!)
         
         let request = gateway.internalizeRequest(self.mockRequestDefaults)
 
-        XCTAssertEqual(request.method("TEST").method, "TEST")
-        XCTAssertEqual(request.path("/abc").path, "/abc")
-        XCTAssertEqual(request.params(["a":"test"]).params?["a"] as? String, "test")
-        XCTAssertEqual(request.headers(["b":"test"]).headers?["b"], "test")
-        XCTAssertEqual(request.body("test".dataUsingEncoding(NSUTF8StringEncoding)).body, "test".dataUsingEncoding(NSUTF8StringEncoding))
-        XCTAssertEqual(request.body("test".dataUsingEncoding(NSUTF8StringEncoding)).body, "test".dataUsingEncoding(NSUTF8StringEncoding))
-        XCTAssertEqual(request.followRedirects(false).followRedirects, false)
-        XCTAssertEqual(request.followRedirects(true).followRedirects, true)
+        XCTAssertEqual(request.copyWith(method: "TEST").method, "TEST")
+        XCTAssertEqual(request.copyWith(path: "/abc").path, "/abc")
+        XCTAssertEqual(request.copyWith(params: ["a":"test"]).params?["a"] as? String, "test")
+        XCTAssertEqual(request.copyWith(headers: ["b":"test"]).headers?["b"], "test")
+        XCTAssertEqual(request.copyWith(body: "test".data(using: String.Encoding.utf8)).body, "test".data(using: String.Encoding.utf8))
+        XCTAssertEqual(request.copyWith(body: "test".data(using: String.Encoding.utf8)).body, "test".data(using: String.Encoding.utf8))
+        XCTAssertEqual(request.copyWith(followRedirects: false).followRedirects, false)
+        XCTAssertEqual(request.copyWith(followRedirects: true).followRedirects, true)
 
-        XCTAssertEqual(request.applyContentTypeParsing(false).applyContentTypeParsing, false)
-        XCTAssertEqual(request.applyContentTypeParsing(true).applyContentTypeParsing, true)
-        XCTAssertEqual(request.contentTypeOverride("test/test").contentTypeOverride, "test/test")
+        XCTAssertEqual(request.copyWith(applyContentTypeParsing: false).applyContentTypeParsing, false)
+        XCTAssertEqual(request.copyWith(applyContentTypeParsing: true).applyContentTypeParsing, true)
+        XCTAssertEqual(request.copyWith(contentTypeOverride: "test/test").contentTypeOverride, "test/test")
 
-        XCTAssertEqual(request.allowCachedResponse(false).allowCachedResponse, false)
-        XCTAssertEqual(request.allowCachedResponse(true).allowCachedResponse, true)
+        XCTAssertEqual(request.copyWith(allowCachedResponse: false).allowCachedResponse, false)
+        XCTAssertEqual(request.copyWith(allowCachedResponse: true).allowCachedResponse, true)
 
-        XCTAssertEqual(request.cacheResponseWithExpiration(10).cacheResponseWithExpiration, 10)
-        XCTAssertEqual(request.cacheResponseWithExpiration(100).cacheResponseWithExpiration, 100)
+        XCTAssertEqual(request.copyWith(cacheResponseWithExpiration: 10).cacheResponseWithExpiration, 10)
+        XCTAssertEqual(request.copyWith(cacheResponseWithExpiration: 100).cacheResponseWithExpiration, 100)
         
-        XCTAssertEqual(request.customCacheIdentifier("testCacheIdentifier").customCacheIdentifier, "testCacheIdentifier")
+        XCTAssertEqual(request.copyWith(customCacheIdentifier: "testCacheIdentifier").customCacheIdentifier, "testCacheIdentifier")
     }
     
     func testInitFromMutableRequestProperties()
     {
-        func XCTAssertEqualDictionaries<S, T: Equatable>(first: [S:T], _ second: [S:T]) {
+        func XCTAssertEqualDictionaries<S, T: Equatable>(_ first: [S:T], _ second: [S:T]) {
             XCTAssert(first == second)
         }
         
-        let gateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://localhost")!)
+        let gateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://localhost")!)
         let props = self.mockRequestDefaults
         let request = gateway.internalizeRequest(self.mockRequestDefaults)
 

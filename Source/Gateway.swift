@@ -16,11 +16,11 @@ let kGatewayDefaultCacheExpiration:UInt = 300
 public protocol Gateway : class
 {
     /// The Base URL to which requests will be sent
-    var baseUrl:NSURL { get }
+    var baseUrl:URL { get }
     var defaultRequestProperties:DefaultRequestPropertySet { get }
     
     /// Sends a request to the gateway
-    func submitRequest(request:RequestProperties, callback:RequestCallback?)
+    func submitRequest(_ request:RequestProperties, callback:RequestCallback?)
 
     
     ///
@@ -51,7 +51,7 @@ public protocol Gateway : class
     
     /// Removes a request from the queue, if it hasn't yet been started. The request must
     /// be from this gateway's pendingRequests queue
-    func cancelRequest(request:Request) -> Bool
+    func cancelRequest(_ request:Request) -> Bool
 }
 
 ///
@@ -60,7 +60,7 @@ public protocol Gateway : class
 public extension Gateway
 {
     /// A convenience method for sending a GET request
-    func get(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, followRedirects:Bool, callback:RequestCallback?)
+    func get(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, followRedirects:Bool, callback:RequestCallback?)
     {
         var request = self.defaultRequestProperties.get
         request.path = path
@@ -73,25 +73,25 @@ public extension Gateway
     }
     
     /// A convenience method for sending a GET request
-    func get(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, callback:RequestCallback?)
+    func get(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, callback:RequestCallback?)
     {
         return self.get(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a GET request
-    func get(path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
+    func get(_ path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
     {
         return self.get(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a GET request
-    func get(path:String, params:QueryParameters?, callback:RequestCallback?)
+    func get(_ path:String, params:QueryParameters?, callback:RequestCallback?)
     {
         return self.get(path, params: params, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a GET request
-    func get(path:String, callback:RequestCallback?)
+    func get(_ path:String, callback:RequestCallback?)
     {
         return self.get(path, params: nil, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
@@ -103,7 +103,7 @@ public extension Gateway
 public extension Gateway
 {
     /// A convenience method for sending a POST request
-    func post(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, followRedirects:Bool, callback:RequestCallback?)
+    func post(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, followRedirects:Bool, callback:RequestCallback?)
     {
         var request = self.defaultRequestProperties.post
         request.path = path
@@ -116,25 +116,25 @@ public extension Gateway
     }
     
     /// A convenience method for sending a POST request
-    func post(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, callback:RequestCallback?)
+    func post(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, callback:RequestCallback?)
     {
         return self.post(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a POST request
-    func post(path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
+    func post(_ path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
     {
         return self.post(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a POST request
-    func post(path:String, params:QueryParameters?, callback:RequestCallback?)
+    func post(_ path:String, params:QueryParameters?, callback:RequestCallback?)
     {
         return self.post(path, params: params, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a POST request
-    func post(path:String, callback:RequestCallback?)
+    func post(_ path:String, callback:RequestCallback?)
     {
         return self.post(path, params: nil, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
@@ -146,7 +146,7 @@ public extension Gateway
 public extension Gateway
 {
     /// A convenience method for sending a PUT request
-    func put(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, followRedirects:Bool, callback:RequestCallback?)
+    func put(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, followRedirects:Bool, callback:RequestCallback?)
     {
         var request = self.defaultRequestProperties.put
         request.path = path
@@ -159,25 +159,25 @@ public extension Gateway
     }
     
     /// A convenience method for sending a PUT request
-    func put(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, callback:RequestCallback?)
+    func put(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, callback:RequestCallback?)
     {
         return self.put(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a PUT request
-    func put(path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
+    func put(_ path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
     {
         return self.put(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a PUT request
-    func put(path:String, params:QueryParameters?, callback:RequestCallback?)
+    func put(_ path:String, params:QueryParameters?, callback:RequestCallback?)
     {
         return self.put(path, params: params, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a PUT request
-    func put(path:String, callback:RequestCallback?)
+    func put(_ path:String, callback:RequestCallback?)
     {
         return self.put(path, params: nil, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
@@ -189,7 +189,7 @@ public extension Gateway
 public extension Gateway
 {
     /// A convenience method for sending a DELETE request
-    func delete(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, followRedirects:Bool, callback:RequestCallback?)
+    func delete(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, followRedirects:Bool, callback:RequestCallback?)
     {
         var request = self.defaultRequestProperties.delete
         request.path = path
@@ -202,25 +202,25 @@ public extension Gateway
     }
     
     /// A convenience method for sending a DELETE request
-    func delete(path:String, params:QueryParameters?, headers:Headers?, body:NSData?, callback:RequestCallback?)
+    func delete(_ path:String, params:QueryParameters?, headers:Headers?, body:Data?, callback:RequestCallback?)
     {
         return self.delete(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a DELETE request
-    func delete(path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
+    func delete(_ path:String, params:QueryParameters?, headers:Headers?, callback:RequestCallback?)
     {
         return self.delete(path, params: params, headers: headers, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a DELETE request
-    func delete(path:String, params:QueryParameters?, callback:RequestCallback?)
+    func delete(_ path:String, params:QueryParameters?, callback:RequestCallback?)
     {
         return self.delete(path, params: params, headers: nil, body: nil, followRedirects: true, callback: callback)
     }
     
     /// A convenience method for sending a DELETE request
-    func delete(path:String, callback:RequestCallback?)
+    func delete(_ path:String, callback:RequestCallback?)
     {
         return self.delete(path, params: nil, headers: nil, body: nil, followRedirects: true, callback: callback)
     }

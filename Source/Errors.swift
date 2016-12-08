@@ -12,9 +12,9 @@ public let kJustApisSdkErrorDomain = "com.anypresence.justapis-sdk"
 public let kJustApisSdkErrorUserInfoContextKey = "justapis-sdk-error-context"
 public let kJustApisSdkErrorUserInfoDescriptionKey = NSLocalizedDescriptionKey
 
-internal func createError(code:Int, context:AnyObject? = nil, description:String? = nil) -> ErrorType
+internal func createError(_ code:Int, context:AnyObject? = nil, description:String? = nil) -> Error
 {
-    var userInfo = [NSObject: AnyObject]()
+    var userInfo = [AnyHashable: Any]()
     if let context = context
     {
         userInfo[kJustApisSdkErrorUserInfoContextKey] = context

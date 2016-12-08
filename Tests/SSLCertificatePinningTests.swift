@@ -16,7 +16,7 @@ private extension String {
     }
     
     init(sep:String, _ lines:[String]){
-        self = lines.joinWithSeparator(sep)
+        self = lines.joined(separator: sep)
     }
     
     init(_ lines:String...){
@@ -27,7 +27,7 @@ private extension String {
 class SSLCertificatePinningTests: XCTestCase {
     
     
-    private let validDerCertificate:NSData = NSData(base64EncodedString: String(
+    private let validDerCertificate:Data = Data(base64Encoded: String(
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
         "VVMxCzAJBgNVBAgTAlZBMQ8wDQYDVQQHEwZSZXN0b24xFDASBgNVBAoTC0FueVBy",
         "ZXNlbmNlMRYwFAYDVQQDEw1sb2NhbGhvc3Quc3NsMSYwJAYJKoZIhvcNAQkBFhdz",
@@ -47,8 +47,8 @@ class SSLCertificatePinningTests: XCTestCase {
         "T2zGXDNYqBsGd4+awKr7JYSQHLmrJiUIfarXD3AT+HqZ6mcyKKGZRXy/tO4WSkqc",
         "6FAexKUfjDYxMfmZNRbnxy8GnKxEd9v3w8JMoiUYpYCT4zyQlksAcB34byrgwbKk",
         "r9peYjRswIMsCQRPLfo6F/2Ly00Iu2kWtnUNR/ZK+uFg46Pe"),
-        options:NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
-    private let validTrimmedPemCertificate:NSData = String(
+        options:NSData.Base64DecodingOptions.ignoreUnknownCharacters)!
+    private let validTrimmedPemCertificate:Data = String(
         "-----BEGIN CERTIFICATE-----",
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
         "VVMxCzAJBgNVBAgTAlZBMQ8wDQYDVQQHEwZSZXN0b24xFDASBgNVBAoTC0FueVBy",
@@ -70,8 +70,8 @@ class SSLCertificatePinningTests: XCTestCase {
         "6FAexKUfjDYxMfmZNRbnxy8GnKxEd9v3w8JMoiUYpYCT4zyQlksAcB34byrgwbKk",
         "r9peYjRswIMsCQRPLfo6F/2Ly00Iu2kWtnUNR/ZK+uFg46Pe",
         "-----END CERTIFICATE-----")
-        .dataUsingEncoding(NSUTF8StringEncoding)!
-    private let validPaddedPemCertificate:NSData = String(
+        .data(using: String.Encoding.utf8)!
+    private let validPaddedPemCertificate:Data = String(
         "                                  ",
         "-----BEGIN CERTIFICATE-----",
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
@@ -97,8 +97,8 @@ class SSLCertificatePinningTests: XCTestCase {
         "                 ",
         "    ",
         "")
-        .dataUsingEncoding(NSUTF8StringEncoding)!
-    private let invalidDerLikeCertificate:NSData = NSData(base64EncodedString: String(
+        .data(using: String.Encoding.utf8)!
+    private let invalidDerLikeCertificate:Data = Data(base64Encoded: String(
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
         "VVMxCzAJBgNVBAgTAlZBMQ8wDQYDVQQHEwZSZXN0b24xFDASBgNVBAoTC0FueVBy",
         "ZXNlbmNlMRYwFAYDVQQDEw1sb2NhbGhvc3Quc3NsMSYwJAYJKoZIhvcNAQkBFhdz",
@@ -118,8 +118,8 @@ class SSLCertificatePinningTests: XCTestCase {
         "T2zGXDNYqBsGd4+awKr7JYSQHLmrJiUIfarXD3AT+HqZ6mcyKKGZRXy/tO4WSkqc",
         "6FAexKUfjDYxMfmZNRbnxy8GnKxEd9v3w8JMoiUYpYCT4zyQlksAcB34byrgwbKk",
         "r9peYjRswIMsCQRPLfo6F/2Ly00Iu2kWtnUNR/ZK+uFg"),
-        options:NSDataBase64DecodingOptions.IgnoreUnknownCharacters)!
-    private let invalidUntrimmablePemLikeCertificate:NSData = String(
+        options:NSData.Base64DecodingOptions.ignoreUnknownCharacters)!
+    private let invalidUntrimmablePemLikeCertificate:Data = String(
         "  asa There are nontrimmable characters here.   ",
         "-----BEGIN CERTIFICATE-----",
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
@@ -145,8 +145,8 @@ class SSLCertificatePinningTests: XCTestCase {
         "  and more nontrimmable characters here               ",
         "    ",
         "")
-        .dataUsingEncoding(NSUTF8StringEncoding)!
-    private let invalidBadDataPemLikeCertificate:NSData = String(
+        .data(using: String.Encoding.utf8)!
+    private let invalidBadDataPemLikeCertificate:Data = String(
         "  asa There are nontrimmable characters here.   ",
         "-----BEGIN CERTIFICATE-----",
         "MIIDgDCCAmgCCQC48nFC+7UzoTANBgkqhkiG9w0BAQUFADCBgTELMAkGA1UEBhMC",
@@ -172,7 +172,7 @@ class SSLCertificatePinningTests: XCTestCase {
         "  and more nontrimmable characters here               ",
         "    ",
         "")
-        .dataUsingEncoding(NSUTF8StringEncoding)!
+        .data(using: String.Encoding.utf8)!
     
     override func setUp() {
         super.setUp()

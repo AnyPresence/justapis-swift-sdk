@@ -40,7 +40,7 @@ internal class InternalRequestQueue {
 
     /// Computed property (potentially expensive). FIFO Array of all pending requests
     internal var pendingRequests:[Request] {
-        return synchronized(self)
+        return synchronized(lock: self)
             {
                 var pendingRequests = [Request]()
                 pendingRequests.reserveCapacity(self.numberPending)
@@ -61,9 +61,9 @@ internal class InternalRequestQueue {
     internal var numberActive:Int { return activeRequests.count }
     
     /// Adds an item to the back of the queue
-    func appendRequest(request:InternalRequest, callback:RequestCallback?)
+    func appendRequest(_ request:InternalRequest, callback:RequestCallback?)
     {
-        synchronized(self) {
+        synchronized(lock: self) {
             // Wrap the request
             let item = QueueItem(request: request, callback: callback)
             
@@ -90,7 +90,7 @@ internal class InternalRequestQueue {
     /// Gets the request from the front of the queue, and prepares it for fulfillment
     func nextRequest() -> InternalRequest?
     {
-        return synchronized(self) {
+        return synchronized(lock: self) {
             // Get the next request from the pendingRequests queue
             guard let item = self.nextPending else
             {
@@ -126,11 +126,11 @@ internal class InternalRequestQueue {
     }
 
     /// Fulfills a request that's been pulled from the queue
-    func fulfillRequest(request:InternalRequest, result:RequestResult)
+    func fulfillRequest(_ request:InternalRequest, result:RequestResult)
     {
-        synchronized(self) {
+        synchronized(lock: self) {
             // Get any callback for this request and pop it from the activeRequests dictionary
-            if let callback = self.activeRequests.removeValueForKey(request)
+            if let callback = self.activeRequests.removeValue(forKey: request)
             {
                 // execute any callback
                 callback(result)
@@ -139,9 +139,9 @@ internal class InternalRequestQueue {
     }
     
     /// Removes a request from the pending request queue, if it exists
-    func cancelPendingRequest(request:InternalRequest) -> Bool
+    func cancelPendingRequest(_ request:InternalRequest) -> Bool
     {
-        return synchronized(self) {
+        return synchronized(lock: self) {
             var item = nextPending
 
             // See if the first item matches
