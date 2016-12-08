@@ -23,7 +23,7 @@ class CompoundResponseProcessorTests: XCTestCase {
     
     private func getDefaultMockResponse() -> InternalResponse
     {
-        let gateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://localhost")!)
+        let gateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://localhost")!)
         let mockRequestDefaults:MutableRequestProperties = MutableRequestProperties(
             method: "GET",
             path: "/",
@@ -41,11 +41,11 @@ class CompoundResponseProcessorTests: XCTestCase {
         let mockResponseDefaults:MutableResponseProperties = MutableResponseProperties(
             gateway: gateway,
             request: mockRequest,
-            requestedURL: gateway.baseUrl.URLByAppendingPathComponent("/?foo=bar"),
+            requestedURL: gateway.baseUrl.appendingPathComponent("/?foo=bar"),
             resolvedURL: gateway.baseUrl,
             statusCode: 400,
             headers: ["test-response-header":"foo bar"],
-            body: "test".dataUsingEncoding(NSUTF8StringEncoding),
+            body: "test".data(using: String.Encoding.utf8),
             parsedBody: "test",
             retreivedFromCache: false)
         
@@ -56,55 +56,55 @@ class CompoundResponseProcessorTests: XCTestCase {
     func testNoProcessors() {
         let processor = CompoundResponseProcessor()
         let response = getDefaultMockResponse()
-        let expectation = self.expectationWithDescription(self.name)
+        let expectation = self.expectation(description: self.name!)
 
         XCTAssertEqual(processor.responseProcessors.count, 0)
 
         processor.processResponse(response, callback: {
-            (response:Response, error:ErrorType?) in
+            (response:Response, error:Error?) in
             
             XCTAssertTrue(true)
             expectation.fulfill()
         })
         
-        self.waitForExpectationsWithTimeout(5, handler: nil)
+        self.waitForExpectations(timeout: 5, handler: nil)
     }
     
     func testOneProcessor() {
         let processor = CompoundResponseProcessor()
-        let response = getDefaultMockResponse().statusCode(0)
-        let expectation = self.expectationWithDescription(self.name)
+        let response = getDefaultMockResponse().copyWith(statusCode: 0)
+        let expectation = self.expectation(description: self.name!)
         
         XCTAssertEqual(processor.responseProcessors.count, 0)
         
         let statusIncrementingProcessor = ResponseProcessorClosureAdapter(closure: {
             (response:Response) in
-            return (request:response.request, response:response.statusCode(response.statusCode + 1), error:nil)
+            return (request:response.request, response:response.copyWith(statusCode: response.statusCode + 1), error:nil)
         })
         
         processor.responseProcessors.append(statusIncrementingProcessor)
         XCTAssertEqual(processor.responseProcessors.count, 1)
 
         processor.processResponse(response, callback: {
-            (response:Response, error:ErrorType?) in
+            (response:Response, error:Error?) in
             
             XCTAssertEqual(response.statusCode, 1)
             expectation.fulfill()
         })
         
-        self.waitForExpectationsWithTimeout(5, handler: nil)
+        self.waitForExpectations(timeout: 5, handler: nil)
     }
     
     func testManySuccessfulProcessors() {
         let processor = CompoundResponseProcessor()
-        let response = getDefaultMockResponse().statusCode(0)
-        let expectation = self.expectationWithDescription(self.name)
+        let response = getDefaultMockResponse().copyWith(statusCode: 0)
+        let expectation = self.expectation(description: self.name!)
         
         XCTAssertEqual(processor.responseProcessors.count, 0)
         
         let statusIncrementingProcessor = ResponseProcessorClosureAdapter(closure: {
             (response:Response) in
-            return (request:response.request, response:response.statusCode(response.statusCode + 1), error:nil)
+            return (request:response.request, response:response.copyWith(statusCode: response.statusCode + 1), error:nil)
         })
         processor.responseProcessors.append(statusIncrementingProcessor)
         processor.responseProcessors.append(statusIncrementingProcessor)
@@ -114,19 +114,19 @@ class CompoundResponseProcessorTests: XCTestCase {
         XCTAssertEqual(processor.responseProcessors.count, 5)
 
         processor.processResponse(response, callback: {
-            (response:Response, error:ErrorType?) in
+            (response:Response, error:Error?) in
             
             XCTAssertEqual(response.statusCode, 5)
             expectation.fulfill()
         })
         
-        self.waitForExpectationsWithTimeout(5, handler: nil)
+        self.waitForExpectations(timeout: 5, handler: nil)
     }
 
     func testErrorInFirstOfManyProcessors() {
         let processor = CompoundResponseProcessor()
-        let response = getDefaultMockResponse().statusCode(0)
-        let expectation = self.expectationWithDescription(self.name)
+        let response = getDefaultMockResponse().copyWith(statusCode: 0)
+        let expectation = self.expectation(description: self.name!)
         
         XCTAssertEqual(processor.responseProcessors.count, 0)
         
@@ -137,7 +137,7 @@ class CompoundResponseProcessorTests: XCTestCase {
 
         let statusIncrementingProcessor = ResponseProcessorClosureAdapter(closure: {
             (response:Response) in
-            return (request:response.request, response:response.statusCode(response.statusCode + 1), error:nil)
+            return (request:response.request, response:response.copyWith(statusCode: response.statusCode + 1), error:nil)
         })
         processor.responseProcessors.append(failingProcessor)
         processor.responseProcessors.append(statusIncrementingProcessor)
@@ -148,13 +148,13 @@ class CompoundResponseProcessorTests: XCTestCase {
         XCTAssertEqual(processor.responseProcessors.count, 6)
         
         processor.processResponse(response, callback: {
-            (response:Response, error:ErrorType?) in
+            (response:Response, error:Error?) in
             
             XCTAssertEqual(response.statusCode, 0)
             XCTAssertNotNil(error ?? nil)
             expectation.fulfill()
         })
         
-        self.waitForExpectationsWithTimeout(5, handler: nil)
+        self.waitForExpectations(timeout: 5, handler: nil)
     }
 }

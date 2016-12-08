@@ -23,7 +23,7 @@ class InternalResponseTests: XCTestCase {
     
     private func getDefaultMockResponse() -> InternalResponse
     {
-        let gateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://localhost")!)
+        let gateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://localhost")!)
         let mockRequestDefaults:MutableRequestProperties = MutableRequestProperties(
             method: "GET",
             path: "/",
@@ -41,11 +41,11 @@ class InternalResponseTests: XCTestCase {
         let mockResponseDefaults:MutableResponseProperties = MutableResponseProperties(
             gateway: gateway,
             request: mockRequest,
-            requestedURL: gateway.baseUrl.URLByAppendingPathComponent("/?foo=bar"),
+            requestedURL: gateway.baseUrl.appendingPathComponent("/?foo=bar"),
             resolvedURL: gateway.baseUrl,
             statusCode: 400,
             headers: ["test-response-header":"foo bar"],
-            body: "test".dataUsingEncoding(NSUTF8StringEncoding),
+            body: "test".data(using: String.Encoding.utf8),
             parsedBody: "test",
             retreivedFromCache: false)
 
@@ -54,18 +54,18 @@ class InternalResponseTests: XCTestCase {
 
     func testBuilderMethods() {
         let response = self.getDefaultMockResponse()
-        let altGateway:CompositedGateway = CompositedGateway(baseUrl: NSURL(string:"http://foo")!)
+        let altGateway:CompositedGateway = CompositedGateway(baseUrl: URL(string:"http://foo")!)
 
-        XCTAssertEqual(response.gateway(altGateway).gateway.baseUrl.absoluteString, "http://foo")
-        XCTAssertEqual(response.request(response.request.method("POST")).request.method, "POST")
-        XCTAssertEqual(response.requestedURL(NSURL(string:"http://test/")!).requestedURL.absoluteString, "http://test/")
-        XCTAssertEqual(response.resolvedURL(NSURL(string:"http://test/alt")!).resolvedURL?.absoluteString, "http://test/alt")
-        XCTAssertEqual(response.statusCode(200).statusCode, 200)
-        XCTAssertEqual(response.headers(["foo":"value"]).headers["foo"], "value")
-        XCTAssertEqual(response.body("foobar".dataUsingEncoding(NSUTF8StringEncoding)).body, "foobar".dataUsingEncoding(NSUTF8StringEncoding))
-        XCTAssertEqual(response.parsedBody("foo").parsedBody as? String, "foo")
-        XCTAssertEqual(response.retreivedFromCache(false).retreivedFromCache, false)
-        XCTAssertEqual(response.retreivedFromCache(true).retreivedFromCache, true)
+        XCTAssertEqual(response.copyWith(gateway: altGateway).gateway.baseUrl.absoluteString, "http://foo")
+        XCTAssertEqual(response.copyWith(request: response.request.copyWith(method: "POST")).request.method, "POST")
+        XCTAssertEqual(response.copyWith(requestedURL: URL(string:"http://test/")!).requestedURL.absoluteString, "http://test/")
+        XCTAssertEqual(response.copyWith(resolvedURL: URL(string:"http://test/alt")!).resolvedURL?.absoluteString, "http://test/alt")
+        XCTAssertEqual(response.copyWith(statusCode: 200).statusCode, 200)
+        XCTAssertEqual(response.copyWith(headers: ["foo":"value"]).headers["foo"], "value")
+        XCTAssertEqual(response.copyWith(body: "foobar".data(using: String.Encoding.utf8)).body, "foobar".data(using: String.Encoding.utf8))
+        XCTAssertEqual(response.copyWith(parsedBody: "foo").parsedBody as? String, "foo")
+        XCTAssertEqual(response.copyWith(retreivedFromCache: false).retreivedFromCache, false)
+        XCTAssertEqual(response.copyWith(retreivedFromCache: true).retreivedFromCache, true)
     }
     
     func testInitFromMutableResponseProperties() {
@@ -77,7 +77,7 @@ class InternalResponseTests: XCTestCase {
         XCTAssertEqual(response.request.params?["foo"] as? String, "bar")
         XCTAssertEqual(response.statusCode, 400)
         XCTAssertEqual(response.headers["test-response-header"], "foo bar")
-        XCTAssertEqual(response.body, "test".dataUsingEncoding(NSUTF8StringEncoding))
+        XCTAssertEqual(response.body, "test".data(using: String.Encoding.utf8))
         XCTAssertEqual(response.parsedBody as? String, "test")
         XCTAssertEqual(response.retreivedFromCache, false)
     }

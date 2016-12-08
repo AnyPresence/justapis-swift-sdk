@@ -11,9 +11,9 @@ import Foundation
 ///
 /// A Request Preparer implementation that does nothing
 ///
-public class NullRequestPreparer : RequestPreparer
+open class NullRequestPreparer : RequestPreparer
 {
-    public func prepareRequest(request:Request) -> Request {
+    open func prepareRequest(_ request:Request) -> Request {
         return request
     }
 }
@@ -22,12 +22,12 @@ public class NullRequestPreparer : RequestPreparer
 /// Implementation of RequestPreparer that infills default values
 /// for headers and query parameters
 ///
-public class DefaultFieldsRequestPreparer : RequestPreparer
+open class DefaultFieldsRequestPreparer : RequestPreparer
 {
-    public var defaultHeaders:Headers!
-    public var defaultQueryParameters:QueryParameters!
+    open var defaultHeaders:Headers!
+    open var defaultQueryParameters:QueryParameters!
     
-    public func prepareRequest(request: Request) -> Request
+    open func prepareRequest(_ request: Request) -> Request
     {
         if (self.defaultHeaders.count == 0 && self.defaultQueryParameters.count == 0)
         {
@@ -41,7 +41,7 @@ public class DefaultFieldsRequestPreparer : RequestPreparer
         {
             if (request.headers?[key] == nil)
             {
-                request = request.header(key, value)
+                request = request.copyWith(headerKey: key, headerValue: value)
             }
         }
         
@@ -50,7 +50,7 @@ public class DefaultFieldsRequestPreparer : RequestPreparer
         {
             if (request.params?[key] == nil)
             {
-                request = request.param(key, value)
+                request = request.copyWith(paramKey: key, paramValue: value)
             }
         }
         return request
@@ -67,19 +67,19 @@ public class DefaultFieldsRequestPreparer : RequestPreparer
 /// Implementation of RequestPreparer that dispatches its functionality
 //  to a closure provided at initialization
 ///
-public class RequestPreparerClosureAdapter : RequestPreparer
+open class RequestPreparerClosureAdapter : RequestPreparer
 {
     public typealias RequestPreparerClosure = (Request) -> (Request)
     
     private let closure:RequestPreparerClosure
     
-    public func prepareRequest(request: Request) -> Request
+    open func prepareRequest(_ request: Request) -> Request
     {
         // Call the closure
         return self.closure(request)
     }
     
-    public init(closure:RequestPreparerClosure)
+    public init(closure: @escaping RequestPreparerClosure)
     {
         self.closure = closure
     }
