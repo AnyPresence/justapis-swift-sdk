@@ -8,26 +8,26 @@
 
 import Foundation
 
-public class InMemoryCacheProvider : CacheProvider
+open class InMemoryCacheProvider : CacheProvider
 {
-    var cache = NSCache()
+    var cache = NSCache<AnyObject, AnyObject>()
 
     internal class CacheObject : NSObject
     {
         var response:ResponseProperties
-        var expiresAt:NSDate
+        var expiresAt:Date
         
-        init(response:ResponseProperties, expiresAt:NSDate)
+        init(response:ResponseProperties, expiresAt:Date)
         {
             self.response = response
             self.expiresAt = expiresAt
         }
     }
     
-    public func cachedResponseForIdentifier(identifier:String, callback:CacheProviderCallback)
+    open func cachedResponseForIdentifier(_ identifier:String, callback:CacheProviderCallback)
     {
         // See if a response was stored for this identifier at all
-        guard let object:CacheObject = self.cache.objectForKey(identifier) as? CacheObject else
+        guard let object:CacheObject = self.cache.object(forKey: identifier as AnyObject) as? CacheObject else
         {
             // Respond that there was no cache entry for this identifier
             callback(nil)
@@ -35,10 +35,11 @@ public class InMemoryCacheProvider : CacheProvider
         }
         
         // See if the response is actually valid, and make sure it expires in the future
-        guard let response:ResponseProperties = object.response where object.expiresAt.timeIntervalSinceNow > 0 else
+        let response = object.response
+        guard object.expiresAt.timeIntervalSinceNow > 0 else
         {
             // clean out this cache object if it already expired or is invalid
-            cache.removeObjectForKey(identifier)
+            cache.removeObject(forKey: identifier as AnyObject)
 
             // Respond that there was no cache entry for this identifier
             callback(nil)
@@ -48,12 +49,12 @@ public class InMemoryCacheProvider : CacheProvider
         callback(response)
     }
     
-    public func setCachedResponseForIdentifier(identifier:String, response:ResponseProperties, expirationSeconds:UInt)
+    open func setCachedResponseForIdentifier(_ identifier:String, response:ResponseProperties, expirationSeconds:UInt)
     {
         // Wrap the response in a cache object, including the preferred expiration date
-        let cacheObject:CacheObject = CacheObject(response:response, expiresAt: NSDate(timeIntervalSinceNow: NSTimeInterval(expirationSeconds)))
+        let cacheObject:CacheObject = CacheObject(response:response, expiresAt: Date(timeIntervalSinceNow: TimeInterval(expirationSeconds)))
 
         // Insert the response into the cache
-        cache.setObject(cacheObject, forKey: identifier)
+        cache.setObject(cacheObject, forKey: identifier as AnyObject)
     }
 }

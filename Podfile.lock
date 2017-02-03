@@ -1,0 +1,42 @@
+PODS:
+  - CocoaAsyncSocket (7.5.1):
+    - CocoaAsyncSocket/GCD (= 7.5.1)
+  - CocoaAsyncSocket/GCD (7.5.1)
+  - CocoaMQTT (1.0.11):
+    - CocoaAsyncSocket (~> 7.5.1)
+    - MSWeakTimer (~> 1.1.0)
+  - HKLSocketStubServer (0.0.1):
+    - CocoaAsyncSocket (~> 7.5.1)
+  - MSWeakTimer (1.1.0)
+  - OHHTTPStubs (5.2.3):
+    - OHHTTPStubs/Default (= 5.2.3)
+  - OHHTTPStubs/Core (5.2.3)
+  - OHHTTPStubs/Default (5.2.3):
+    - OHHTTPStubs/Core
+    - OHHTTPStubs/JSON
+    - OHHTTPStubs/NSURLSession
+    - OHHTTPStubs/OHPathHelpers
+  - OHHTTPStubs/JSON (5.2.3):
+    - OHHTTPStubs/Core
+  - OHHTTPStubs/NSURLSession (5.2.3):
+    - OHHTTPStubs/Core
+  - OHHTTPStubs/OHPathHelpers (5.2.3)
+  - OHHTTPStubs/Swift (5.2.3):
+    - OHHTTPStubs/Core
+
+DEPENDENCIES:
+  - CocoaMQTT (~> 1.0.11)
+  - HKLSocketStubServer (~> 0.0.1)
+  - OHHTTPStubs (~> 5.2.3)
+  - OHHTTPStubs/Swift (~> 5.2.3)
+
+SPEC CHECKSUMS:
+  CocoaAsyncSocket: e0a7e93b2ffa411592ff87e58524fbbc9b95b4fa
+  CocoaMQTT: bf25a20cccf66f696f25d9eb419bd3ad32b55dfc
+  HKLSocketStubServer: 13573c18c95d12e7bdd9d8c423f4363fcd33b4c8
+  MSWeakTimer: 3960ca382f8133714ea4a3a3489424469457f52b
+  OHHTTPStubs: e238cd5b66d8efa51c861db45895de8fe079f4a7
+
+PODFILE CHECKSUM: a3353619d30132480e8714c6e8cd08fa9a6e4b43
+
+COCOAPODS: 1.1.1

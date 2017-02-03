@@ -1,3 +1,0 @@
-[submodule "Tests/Submodules/OHHTTPStubs"]
-	path = Tests/Submodules/OHHTTPStubs
-	url = https://github.com/AliSoftware/OHHTTPStubs.git

@@ -9,7 +9,7 @@
 import Foundation
 
 /// Approximates Objective-C's @synchronized locking behavior and syntax.
-internal func synchronized<T>(lock: AnyObject, @noescape closure: () throws -> T) rethrows -> T {
+internal func synchronized<T>(lock: AnyObject, closure: () throws -> T) rethrows -> T {
     objc_sync_enter(lock)
     defer {
         objc_sync_exit(lock)
@@ -18,7 +18,7 @@ internal func synchronized<T>(lock: AnyObject, @noescape closure: () throws -> T
 }
 
 /// Converts a Dictionary with Optional values to a dictionary with NSNull values in place of nils
-internal func dictionaryWithNilsConvertedToNSNulls<Key,Value>(dictionary:Dictionary<Key, Value?>) -> Dictionary<Key,Value>
+internal func dictionaryWithNilsConvertedToNSNulls<Key,Value>(_ dictionary:Dictionary<Key, Value?>) -> Dictionary<Key,Value>
 {
     var out = Dictionary<Key, Value>()
     for (key, value) in dictionary
@@ -36,7 +36,7 @@ internal func dictionaryWithNilsConvertedToNSNulls<Key,Value>(dictionary:Diction
 }
 
 /// Converts an Array with Optional values to an array with NSNull values in place of nils
-internal func arrayWithNilsConvertedToNSNulls<Value>(array:Array<Value?>) -> Array<Value>
+internal func arrayWithNilsConvertedToNSNulls<Value>(_ array:Array<Value?>) -> Array<Value>
 {
     var out = Array<Value>()
     for value in array
